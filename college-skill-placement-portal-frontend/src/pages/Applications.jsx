@@ -1,12 +1,49 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Link } from "react-router-dom";
-
+import Navbar from "../components/Navbar";
 function Applications() {
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [summary, setSummary] = useState(null);
+    const [selectedStatus, setSelectedStatus] = useState("ALL");
+
+    const fetchApplicationsByStatus = async (
+    studentId,
+    status
+) => {
+    try {
+        setLoading(true);
+        setError("");
+
+        if (status === "ALL") {
+            const response = await api.get(
+                `/api/job-applications/student/${studentId}`
+            );
+
+            setApplications(response.data);
+        } else {
+            const response = await api.get(
+                `/api/job-applications/student/${studentId}/status/${status}`
+            );
+
+            setApplications(response.data);
+        }
+    } catch (err) {
+        console.error(
+            "Applications filter error:",
+            err
+        );
+
+        setError(
+            err.response?.data?.message ||
+            "Failed to load applications."
+        );
+    } finally {
+        setLoading(false);
+    }
+};
 
     useEffect(() => {
         const fetchApplications = async () => {
@@ -24,11 +61,10 @@ function Applications() {
 
                 setSummary(summaryResponse.data);    
 
-                const response = await api.get(
-                    `/api/job-applications/student/${studentId}`
-                );
-
-                setApplications(response.data);
+                await fetchApplicationsByStatus(
+    studentId,
+    selectedStatus
+);
             } catch (err) {
                 console.error(
                     "Applications fetch error:",
@@ -45,7 +81,7 @@ function Applications() {
         };
 
         fetchApplications();
-    }, []);
+    }, [selectedStatus]);
 
     if (loading) {
         return <h2>Loading applications...</h2>;
@@ -55,51 +91,84 @@ function Applications() {
     <div>
         <h1>My Applications</h1>
 
+        <Navbar />
+
+        <h2>Filter Applications</h2>
+
+<div className="application-filter-card">
+    <h2>Filter Applications</h2>
+
+    <select
+        value={selectedStatus}
+        onChange={(e) =>
+            setSelectedStatus(e.target.value)
+        }
+    >
+        <option value="ALL">All</option>
+        <option value="APPLIED">Applied</option>
+        <option value="SHORTLISTED">Shortlisted</option>
+        <option value="INTERVIEW">Interview</option>
+        <option value="SELECTED">Selected</option>
+        <option value="REJECTED">Rejected</option>
+    </select>
+</div>
+
         {summary && (
-            <div>
-                <h2>Application Summary</h2>
+    <div className="application-summary-section">
+        <h2>Application Summary</h2>
 
-                <p>
-                    <strong>Total Applications:</strong>{" "}
+        <div className="application-summary-grid">
+
+            <div className="application-summary-card">
+                <span>Total Applications</span>
+                <strong>
                     {summary.totalApplications}
-                </p>
-
-                <p>
-                    <strong>Applied:</strong>{" "}
-                    {summary.applied}
-                </p>
-
-                <p>
-                    <strong>Shortlisted:</strong>{" "}
-                    {summary.shortlisted}
-                </p>
-
-                <p>
-                    <strong>Interview:</strong>{" "}
-                    {summary.interview}
-                </p>
-
-                <p>
-                    <strong>Selected:</strong>{" "}
-                    {summary.selected}
-                </p>
-
-                <p>
-                    <strong>Rejected:</strong>{" "}
-                    {summary.rejected}
-                </p>
-
-                <hr />
+                </strong>
             </div>
-        )}
+
+            <div className="application-summary-card">
+                <span>Applied</span>
+                <strong>
+                    {summary.applied}
+                </strong>
+            </div>
+
+            <div className="application-summary-card">
+                <span>Shortlisted</span>
+                <strong>
+                    {summary.shortlisted}
+                </strong>
+            </div>
+
+            <div className="application-summary-card">
+                <span>Interview</span>
+                <strong>
+                    {summary.interview}
+                </strong>
+            </div>
+
+            <div className="application-summary-card">
+                <span>Selected</span>
+                <strong>
+                    {summary.selected}
+                </strong>
+            </div>
+
+            <div className="application-summary-card">
+                <span>Rejected</span>
+                <strong>
+                    {summary.rejected}
+                </strong>
+            </div>
+
+        </div>
+    </div>
+)}
 
         {error && (
             <p>{error}</p>
         )}
 
-            {error && (
-                <p>{error}</p>
-            )}
 
             {!error && applications.length === 0 && (
                 <p>
@@ -107,55 +176,73 @@ function Applications() {
                 </p>
             )}
 
-            {applications.map((application) => (
-                <div key={application.id}>
-                    <h2>
-                        {application.job?.title ||
-                            "Job"}
-                    </h2>
+            <div className="applications-grid">
+    {applications.map((application) => (
+        <div
+            className="application-card"
+            key={application.id}
+        >
+            <h2>
+                {application.job?.title ||
+                    "Job"}
+            </h2>
 
-                    <p>
-                        <strong>Company:</strong>{" "}
+            <div className="application-info">
+
+                <p>
+                    <span>Company</span>
+                    <strong>
                         {application.job?.company ||
                             "N/A"}
-                    </p>
+                    </strong>
+                </p>
 
-                    <p>
-                        <strong>Location:</strong>{" "}
+                <p>
+                    <span>Location</span>
+                    <strong>
                         {application.job?.location ||
                             "N/A"}
-                    </p>
+                    </strong>
+                </p>
 
-                    <p>
-                        <strong>Status:</strong>{" "}
+                <p>
+                    <span>Status</span>
+                    <strong
+                        className={`application-status status-${application.status?.toLowerCase()}`}
+                    >
                         {application.status}
-                    </p>
+                    </strong>
+                </p>
 
-                    <p>
-                        <strong>Applied At:</strong>{" "}
+                <p>
+                    <span>Applied At</span>
+                    <strong>
                         {application.appliedAt
                             ? new Date(
                                   application.appliedAt
                               ).toLocaleString()
                             : "N/A"}
-                    </p>
+                    </strong>
+                </p>
 
-                    <p>
-                        <strong>Match Percentage:</strong>{" "}
+                <p>
+                    <span>Match Percentage</span>
+                    <strong>
                         {application.matchPercentageAtApplication}%
-                    </p>
+                    </strong>
+                </p>
 
-                    <p>
-                <Link
-                    to={`/applications/${application.id}`}
-                     >
-                     View Application Details
-                </Link>
-                    </p>
+            </div>
 
-                    <hr />
-                </div>
-            ))}
+            <Link
+                className="view-application-link"
+                to={`/applications/${application.id}`}
+            >
+                View Application Details →
+            </Link>
+        </div>
+    ))}
+</div>
         </div>
     );
 }

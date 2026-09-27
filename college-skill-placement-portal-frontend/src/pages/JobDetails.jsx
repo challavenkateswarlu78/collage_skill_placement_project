@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
+import Navbar from "../components/Navbar";
 
 function JobDetails() {
     const { id } = useParams();
@@ -116,56 +117,95 @@ function JobDetails() {
         <div>
             <h1>{job.title}</h1>
 
-            <p>
-                <strong>Company:</strong>{" "}
-                {job.company}
+            <Navbar />
+
+           <div className="job-details-card">
+
+    <div className="job-info-grid">
+
+        <div className="job-info-item">
+            <span>Company</span>
+            <strong>{job.company}</strong>
+        </div>
+
+        <div className="job-info-item">
+            <span>Location</span>
+            <strong>{job.location}</strong>
+        </div>
+
+        <div className="job-info-item">
+            <span>Job Type</span>
+            <strong>{job.jobType}</strong>
+        </div>
+
+        <div className="job-info-item">
+            <span>Minimum CGPA</span>
+            <strong>{job.minCgpa}</strong>
+        </div>
+
+        <div className="job-info-item">
+            <span>Status</span>
+            <strong>
+                {job.active ? "Active" : "Inactive"}
+            </strong>
+        </div>
+
+    </div>
+
+    <div className="job-description">
+        <h2>Description</h2>
+
+        <p>{job.description}</p>
+    </div>
+
+    <div className="job-skills">
+        <h2>Required Skills</h2>
+
+        <p>{job.requiredSkills}</p>
+    </div>
+
+</div>
+
+{message && (
+    <p className="success-message">
+        <strong>{message}</strong>
+    </p>
+)}
+
+
+{error && (
+     <p className="error-message">
+        <strong>{error}</strong>
+    </p>
+)}
+
+{job.active && student && (
+    <div className="application-status-card">
+        <h2>Application Status</h2>
+
+        {alreadyApplied ? (
+            <p className="application-applied">
+                You have already applied for this job.
             </p>
-
-            <p>
-                <strong>Location:</strong>{" "}
-                {job.location}
+        ) : (
+            <p className="application-not-applied">
+                You have not applied for this job yet.
             </p>
+        )}
+    </div>
+)}
 
-            <p>
-                <strong>Job Type:</strong>{" "}
-                {job.jobType}
-            </p>
-
-            <p>
-                <strong>Description:</strong>{" "}
-                {job.description}
-            </p>
-
-            <p>
-                <strong>Required Skills:</strong>{" "}
-                {job.requiredSkills}
-            </p>
-
-            <p>
-                <strong>Minimum CGPA:</strong>{" "}
-                {job.minCgpa}
-            </p>
-
-            <p>
-                <strong>Active:</strong>{" "}
-                {job.active ? "Yes" : "No"}
-            </p>
-
-            {message && (
-                <p>{message}</p>
-            )}
-
-            {error && (
-                <p>{error}</p>
-            )}
-
-            {job.active && student && (
+        {job.active && student && (
     alreadyApplied ? (
-        <button disabled>
+        <button
+            className="already-applied-button"
+            disabled
+        >
             Already Applied
         </button>
     ) : (
         <button
+            className="apply-job-button"
             onClick={handleApply}
             disabled={applying}
         >
@@ -176,12 +216,12 @@ function JobDetails() {
     )
 )}
 
-            <br />
-            <br />
-
-            <Link to="/jobs">
-                Back to Jobs
-            </Link>
+            <Link
+    className="back-to-jobs"
+    to="/jobs"
+>
+    ← Back to Jobs
+</Link>
         </div>
     );
 }

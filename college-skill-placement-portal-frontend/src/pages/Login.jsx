@@ -27,12 +27,17 @@ function Login() {
             console.log("Login response:", response.data);
 
             const token = response.data.token;
+const userId = response.data.userId;
 
-            if (!token) {
-                throw new Error("Token not received from server");
-            }
+if (!token) {
+    throw new Error("Token not received from server");
+}
 
-            login(token);
+if (!userId) {
+    throw new Error("User ID not received from server");
+}
+
+login(token, userId);
 
             navigate("/dashboard");
         } catch (err) {
@@ -53,47 +58,79 @@ function Login() {
     };
 
     return (
-        <div>
-            <h1>College Skill Placement Portal</h1>
+    <div className="login-page">
 
-            <h2>Login</h2>
+        <div className="login-card">
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username</label>
+            <div className="login-header">
+                <h1>
+                    College Skill Placement Portal
+                </h1>
+
+                <p>
+                    Student Login
+                </p>
+            </div>
+
+            <form
+                className="login-form"
+                onSubmit={handleSubmit}
+            >
+
+                <div className="login-form-group">
+                    <label>
+                        Username
+                    </label>
 
                     <input
                         type="text"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) =>
+                            setUsername(e.target.value)
+                        }
+                        placeholder="Enter username"
                         required
                     />
                 </div>
 
-                <div>
-                    <label>Password</label>
+                <div className="login-form-group">
+                    <label>
+                        Password
+                    </label>
 
                     <input
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) =>
+                            setPassword(e.target.value)
+                        }
+                        placeholder="Enter password"
                         required
                     />
                 </div>
 
                 {error && (
-                    <p>{error}</p>
+                    <p className="login-error">
+                        {error}
+                    </p>
                 )}
 
                 <button
+                    className="login-button"
                     type="submit"
                     disabled={loading}
                 >
-                    {loading ? "Logging in..." : "Login"}
+                    {loading
+                        ? "Logging in..."
+                        : "Login"}
                 </button>
+
             </form>
+
         </div>
-    );
+
+    </div>
+);
 }
 
 export default Login;

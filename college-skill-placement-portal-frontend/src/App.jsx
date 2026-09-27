@@ -8,6 +8,7 @@ import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import Applications from "./pages/Applications";
 import ApplicationDetails from "./pages/ApplicationDetails";
+import Notifications from "./pages/Notifications";
 
 function App() {
     return (
@@ -82,6 +83,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <ApplicationDetails />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute>
+                            <Notifications />
                         </ProtectedRoute>
                     }
                 />
